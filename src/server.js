@@ -4,7 +4,7 @@ const cors = require("cors")
 const dotenv = require("dotenv")
 dotenv.config()
 
-// const postsService = require("./services/posts")
+const postsService = require("./services/posts")
 // const profilesService = require("./services/profiles")
 // const experiencesService = require("./services/experiences")
 
@@ -17,7 +17,7 @@ const mongoose = require("mongoose")
 server.use(express.json())
 server.use(cors())
 
-// server.use("/posts", postsService)
+server.use("/posts", postsService)
 // server.use("/profiles", profileService)
 // server.use("/experiences", experiencesService)
 
