@@ -47,6 +47,7 @@ experiencesRouter.put("/:id", async (req, res, next) => {
             next(error)
         }
     } catch (error) {
+        error.httpStatusCode = 400
         next(error)
     }
 })

@@ -8,18 +8,22 @@ const autopopulate = require("mongoose-autopopulate")
 // const v = require("validator")
 
 const Like = new Schema ({
-    profileId: {
-        type: Schema.Types.ObjectId,
-        ref: ProfileModel,
-        required: true,
-        autopopulate: {select: 'name surname -_id'}
+        from: {
+            type: Schema.Types.ObjectId,
+            ref: ProfileModel,
+            required: true,
+            autopopulate: {select: 'name surname -_id'}
+        } 
+    },
+    {
+        _id: false
     }
-})
+)
 
 Like.plugin(autopopulate)
 
 const Comment = new Schema ({
-    profileId: {
+    from: {
         type: Schema.Types.ObjectId,
         ref: ProfileModel,
         required: true,
@@ -49,7 +53,9 @@ const Post = new Schema({
         required: [function() { return !this.text }, 'Posts need either an image or a message.']
     },
     likes: {
-        type: [Like],
+        type: [Schema.Types.ObjectId],
+        autopopulate: {select: '_id name surname'},
+        ref: ProfileModel,
         default: []
     },
     comments: {
@@ -63,4 +69,5 @@ const Post = new Schema({
 Post.plugin(autopopulate)
 
 const PostModel = mongoose.model("posts", Post)
-module.exports = PostModel 
+const LikeModel = mongoose.model("likes", Like)
+module.exports = { PostModel, LikeModel, Comment } 

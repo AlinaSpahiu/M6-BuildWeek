@@ -24,6 +24,7 @@ router.get("/", async (req, res, next) => {
        //http://localhost:3022/users?age=26
        // mongoDB: {"age": {$gt:26}}
    } catch(error){
+     error.httpStatusCode = 500
      next(error)
    }
    
