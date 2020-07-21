@@ -39,19 +39,33 @@ router.get("/:id", async(req,res,next) => {
     }
 })
 
-router.post("/", async(req,res,next) => {
-    try {
-        delete req.body.likes
-        delete req.body.comments
+router.post("/",
+    body('profileId')
+        .custom( async pID => { 
+            let profile =  await Profile.findById(pID) 
+            if (profile) return true
+            else throw new Error("No profile with this ID")
+        }), 
+    async(req,res,next) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+          const error = new Error()
+          error.httpStatusCode = 400
+          error.message = errors
+          next(error)
+        } else try {
+            delete req.body.likes
+            delete req.body.comments
 
-        let newPost = new Post(req.body)
-        await newPost.save()
-        res.status(200).send(newPost)
-    } catch (error) {
-        error.httpStatusCode = 500
-        next(error)
+            let newPost = new Post(req.body)
+            await newPost.save()
+            res.status(200).send(newPost)
+        } catch (error) {
+            error.httpStatusCode = 500
+            next(error)
+        }
     }
-})
+)
 
 router.get("/:id/likes", async(req,res,next) => {
     try {
@@ -148,6 +162,8 @@ router.post(
     }
 )
 
+
+
 router.put("/:id", async(req,res,next) => {
     try {
         //We don't want POST/PUT requests to interfere with actual likes/comments. 
@@ -184,6 +200,25 @@ router.delete("/:id", async(req,res,next) => {
         next(error)
     }
 })
+
+router.delete("/:id/comment/:cid", async(req,res,next)=> {
+    try {
+        let post = await Post.findById(req.params.id)
+        post.comments = post.comments.filter( comment => 
+            comment._id.toString() !== req.params.cid 
+        )
+        
+        let updatedPost = await Post.findByIdAndUpdate(req.params.id, post)
+        
+        if (updatedPost) {
+            res.status(201).send("Deleted comment.")
+        } else throw new Error("Invalid comment ID or post ID.")
+    } catch (error) {
+        error.httpStatusCode = 400
+        next(error)
+    }
+    
+}) 
 
 
 
