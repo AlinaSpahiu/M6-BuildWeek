@@ -77,6 +77,16 @@ router.get("/:id/likes", async(req,res,next) => {
     }
 })
 
+router.get("/:id/comments", async(req,res,next) => {
+    try {
+        let post = await Post.findById(req.params.id)
+        res.status(200).send(post.comments)
+    } catch (error) {
+        error.httpStatusCode = 404
+        next(error)
+    }
+})
+
 router.post(
     "/:id/like", 
     body('profileId')
