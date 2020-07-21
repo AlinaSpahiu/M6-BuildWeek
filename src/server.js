@@ -24,7 +24,7 @@ const mongoose = require("mongoose")
 // server.use("/posts", postsService)
 //  server.use("/profiles", router)
 server.use("/posts", postsService)
-server.use("/profiles", profileService)
+server.use("/profiles", profilesService)
 // server.use("/experiences", experiencesService)
 
 server.use(errorsHandler)
