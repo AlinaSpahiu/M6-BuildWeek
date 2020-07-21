@@ -6,7 +6,7 @@ dotenv.config()
 
 // const postsService = require("./services/posts")
 // const profilesService = require("./services/profiles")
-// const experiencesService = require("./services/experiences")
+const experiencesService = require("./services/experiences")
 
 const errorsHandler = require("./errorsHandler")
 const server = express()
@@ -19,12 +19,13 @@ server.use(cors())
 
 // server.use("/posts", postsService)
 // server.use("/profiles", profileService)
-// server.use("/experiences", experiencesService)
+server.use("/experiences", experiencesService)
 
 server.use(errorsHandler)
 console.log(listEndpoints(server))
 
 const port = process.env.PORT || 5000;
+
 
 mongoose
   .connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PWD}@teama.aklwd.gcp.mongodb.net/linkedin?retryWrites=true&w=majority`, {

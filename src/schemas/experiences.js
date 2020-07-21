@@ -2,6 +2,7 @@
 
 const mongoose = require("mongoose")
 const { Schema } = require("mongoose")
+const ProfileModel = require("../services/profiles")
 
 // const v = require("validator")
 
@@ -31,18 +32,19 @@ const experiencesSchema = new Schema({
         type: String,
         required: true
     },
-    createdAt: {
-        type: Date,
+    image: {
+        type: String,
+        required: false,
+        default: "https://via.placeholder.com/150"
 
     },
-    updatedAt: {
-        type: Date,
 
-    },
-    //profile/id: [{ type: Schema.Types.ObjectId, ref: "profile/id" }]
+    profileId: { type: Schema.Types.ObjectId, ref: ProfileModel }
 
 
 },
+
+    { timestamps: true }
 )
 
 
