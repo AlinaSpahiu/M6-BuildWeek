@@ -5,6 +5,20 @@ const experiencesRouter = express.Router()
 
 const { experiencesModel } = require("../schemas/experiences")
 
+/////////MULTER //////////////////////// DA VERIFICARE E FINIRE /////////////////////
+
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }).single("demo_image");
+
+experiencesRouter.post("/image", (req, res) => {
+    upload(req, res, (err) => {
+        if (err) {
+            res.status(400).send("Image not uploaded");
+        }
+        res.send(req.file);
+    });
+});
+//////////////////////MULTER////////////////// DA VERIFICARE E FINIRE//////////////////
 
 experiencesRouter.get("/", async (req, res, next) => {
     try {
