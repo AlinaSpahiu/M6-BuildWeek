@@ -5,20 +5,22 @@ const dotenv = require("dotenv")
 dotenv.config()
 
 // const postsService = require("./services/posts")
-// const profilesService = require("./services/profiles")
+const router = require("./services/profiles")
 // const experiencesService = require("./services/experiences")
 
 const errorsHandler = require("./errorsHandler")
 const server = express()
 
-const listEndpoints = require("express-list-endpoints")
-const mongoose = require("mongoose")
-
 server.use(express.json())
 server.use(cors())
 
+const listEndpoints = require("express-list-endpoints")
+const mongoose = require("mongoose")
+
+
+
 // server.use("/posts", postsService)
-// server.use("/profiles", profileService)
+ server.use("/profiles", router)
 // server.use("/experiences", experiencesService)
 
 server.use(errorsHandler)
