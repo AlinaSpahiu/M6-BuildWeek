@@ -6,11 +6,11 @@ const router = express.Router()
 const q2m = require("query-to-mongo")
 const { body, validationResult } = require("express-validator")
 
-const { PostModel, LikeModel }  = require("../schemas/posts")
+const { PostModel, CommentModel }  = require("../schemas/posts")
 const Profile = require("../schemas/profiles")
 
 const Post = PostModel
-const Like = LikeModel
+const Comment = CommentModel
 
 const mongoose = require("mongoose")
 
@@ -95,7 +95,7 @@ router.post(
 
                 if (updatedPost) {
                     res.status(200).send(liking ? "Liked!" : "Unliked")
-                } else throw new Error("No clue")
+                } else throw new Error("Didn't update. Try again later.")
 
             } else throw new Error("Invalid ID")
         } catch (error) {
@@ -105,47 +105,48 @@ router.post(
     }
 )
 
-// router.post(
-//     "/:id/like", 
-//     body('profileId')
-//         .custom( async pID => { 
-//             let profile = 
-//             await Profile.findById(pID) 
-//             if (profile) return true
-//             else throw new Error("No profile with this ID")
-//         }),
-//     async(req,res,next) => {
-//         const errors = validationResult(req)
-//         if (!errors.isEmpty()) {
-//           const error = new Error()
-//           error.httpStatusCode = 400
-//           error.message = errors
-//           next(error)
-//         } else try {
-//             let post = await Post.findById(req.params.id)
-//             if (post) { 
-//                 let likeAuthor = mongoose.Types.ObjectId(req.body.profileId)
-//                 let liking = !post.likes.some(like => like._id.toString() === likeAuthor.toString())
+router.post(
+    "/:id/comment", 
+    [body('profileId')
+        .custom( async pID => { 
+            let profile = 
+            await Profile.findById(pID) 
+            if (profile) return true
+            else throw new Error("No profile with this ID")
+        }),
+    body('text').exists().withMessage("Text is required")
+    ],
+    async(req,res,next) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+          const error = new Error()
+          error.httpStatusCode = 400
+          error.message = errors
+          next(error)
+        } else try {
+            let post = await Post.findById(req.params.id)
+            if (post) { 
 
-//                 likes = post.likes.map(like => like._id)
+                let comment = new Comment({
+                    from: req.body.profileId,
+                    text: req.body.text
+                })
 
-//                 likes = liking ?
-//                     [...likes, likeAuthor] :
-//                     likes.filter(like => like.toString() !== likeAuthor.toString())                    
+                post.comments.push(comment)
 
-//                 let updatedPost = await Post.findByIdAndUpdate(req.params.id, { likes })
+                let updatedPost = await Post.findByIdAndUpdate(req.params.id, post)
 
-//                 if (updatedPost) {
-//                     res.status(200).send(liking ? "Liked!" : "Unliked")
-//                 } else throw new Error("No clue")
+                if (updatedPost) {
+                    res.status(200).send("Commented")
+                } else throw new Error("Didn't update. Try again later.")
 
-//             } else throw new Error("Invalid ID")
-//         } catch (error) {
-//             error.httpStatusCode = 400
-//             next(error)
-//         }
-//     }
-// )
+            } else throw new Error("Invalid ID")
+        } catch (error) {
+            error.httpStatusCode = 400
+            next(error)
+        }
+    }
+)
 
 router.put("/:id", async(req,res,next) => {
     try {
