@@ -42,7 +42,7 @@ router.get("/:id", async(req,res,next) => {
 router.post("/",
     body('profileId')
         .custom( async pID => { 
-            let profile =  await Profile.findById(pID) 
+            let profile = await Profile.findById(pID) 
             if (profile) return true
             else throw new Error("No profile with this ID")
         }), 

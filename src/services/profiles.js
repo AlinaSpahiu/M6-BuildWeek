@@ -1,11 +1,17 @@
 //profiles router
 
 const express = require("express")
-const Profile = require("../schemas/profiles")
+const mongoose = require("mongoose")
 const q2m = require("query-to-mongo")
+const { Router } = require("express")
+const experiencesRouter = require("./experiences")
 
+const ProfileSchema = require("../schemas/profiles")
+const Profile = mongoose.model("profiles", ProfileSchema)
 
 const router = express.Router()
+
+// profile/id/experiences/eid
 
 router.get("/", async (req, res, next) => {
   const parsedQuery = q2m(req.query)
@@ -24,7 +30,7 @@ router.get("/", async (req, res, next) => {
        //http://localhost:3022/users?age=26
        // mongoDB: {"age": {$gt:26}}
    } catch(error){
-     error.httpStatusCode = 500
+    error.httpStatusCode = 500
      next(error)
    }
    
@@ -33,7 +39,7 @@ router.get("/", async (req, res, next) => {
  // 2. GET one:
 router.get("/:id", async (req, res, next) => {
   try{
-     const user =   await Profile.findById(req.params.id)
+     const user = await Profile.findById(req.params.id)
      if(user){res.send(user)}
      else {
        const error = new Error()
@@ -49,6 +55,12 @@ router.get("/:id", async (req, res, next) => {
 
 })
 
+// Get experiences
+router.use("/:username/experiences", function(req,res,next) {
+    let profile = Profile.findOne({username: req.params.username})
+    req.profileId = profile._id.toString()
+    next()
+}, experiencesRouter)
  
 // 3. POST:
 router.post("/", async (req, res, next) => {

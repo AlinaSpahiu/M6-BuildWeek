@@ -2,25 +2,10 @@
 
 const mongoose = require("mongoose")
 const { Schema } = require("mongoose")
-const ProfileModel = require("./profiles")
+const Profile = require("./profiles")
+const ProfileModel = mongoose.model("profiles", Profile)
+
 const autopopulate = require("mongoose-autopopulate")
-
-// const v = require("validator")
-
-// const Like = new Schema ({
-//         from: {
-//             type: Schema.Types.ObjectId,
-//             ref: ProfileModel,
-//             required: true,
-//             autopopulate: {select: 'name surname -_id'}
-//         } 
-//     },
-//     {
-//         _id: false
-//     }
-// )
-
-// Like.plugin(autopopulate)
 
 const Comment = new Schema ({
     from: {
@@ -43,6 +28,10 @@ const Post = new Schema({
         ref: ProfileModel,
         required: true,
         autopopulate: {select: '_id name surname'}
+    },
+    username: {
+        type: String,
+        required: false
     },
     text: {
         type: String,
@@ -69,6 +58,5 @@ const Post = new Schema({
 Post.plugin(autopopulate)
 
 const PostModel = mongoose.model("posts", Post)
-// const LikeModel = mongoose.model("likes", Like)
 const CommentModel = mongoose.model("comments", Comment)
 module.exports = { PostModel, CommentModel } 

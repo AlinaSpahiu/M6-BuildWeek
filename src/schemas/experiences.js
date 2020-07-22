@@ -2,51 +2,58 @@
 
 const mongoose = require("mongoose")
 const { Schema } = require("mongoose")
-const ProfileModel = require("../services/profiles")
+const Profile = require("../schemas/profiles")
+// const mongooseAutoPopulate = require("mongoose-autopopulate")
+const ProfileModel = mongoose.model("profiles", Profile)
+
 
 // const v = require("validator")
 
-const experiencesSchema = new Schema({
-    role: {
-        type: String,
-        required: true,
+const experiencesSchema = new Schema(
+    {
+        role: {
+            type: String,
+            required: true,
+        },
+        company: {
+            type: String,
+            required: true,
+        },
+        startDate: {
+            type: Date,
+        },
+        endDate: {
+            type: Date,
+        },
+        description: {
+            type: String
+        },
+        area: {
+            type: String,
+            required: true
+        },
+        username: {
+            type: String,
+            required: false
+        },
+        image: {
+            type: String,
+            required: false,
+            default: "https://via.placeholder.com/150"
+        },
+        profileId: {
+            type: Schema.Types.ObjectId, 
+            ref: ProfileModel,
+            required: true,
+            // autopopulate: { select: '_id name surname'}
+        }
     },
-    company: {
-        type: String,
-        required: true,
-    },
-    startDate: {
-        type: Date,
-    },
-    endDate: {
-        type: Date,
-    },
-    description: {
-        type: String
-    },
-    area: {
-        type: String,
-        required: true
-    },
-    username: {
-        type: String,
-        required: true
-    },
-    image: {
-        type: String,
-        required: false,
-        default: "https://via.placeholder.com/150"
-
-    },
-
-    profileId: { type: Schema.Types.ObjectId, ref: ProfileModel }
-
-
-},
-
-    { timestamps: true }
+    { 
+        timestamps: true 
+    }
 )
 
+// experiencesSchema.plugin(mongooseAutoPopulate)
 
 experiencesSchema.static("findStudentExperiences", async function (id) {
     const experience = await experiencesModel.findOne({ _id: id }).populate("profile")/////////////<--profile/id
