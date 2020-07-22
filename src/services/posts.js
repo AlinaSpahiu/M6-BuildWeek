@@ -87,8 +87,22 @@ router.get("/:id/comments", async(req,res,next) => {
     }
 })
 
+router.get("/:id/comments/:cid", async(req,res,next) => {
+    try {
+        let post = await Post.findById(req.params.id)
+        let comment = post.comments.find( comment => comment._id.toString() === req.params.id)
+
+        if (comment) {
+            res.status(200).send(comment)
+        } else throw new Error ("Comment not found")
+    } catch (error) {
+        error.httpStatusCode = 404
+        next(error)
+    }
+})
+
 router.post(
-    "/:id/like", 
+    "/:id/likes", 
     body('profileId')
         .custom( async pID => { 
             let profile = 
@@ -107,13 +121,15 @@ router.post(
             let post = await Post.findById(req.params.id)
             if (post) { 
                 let likeAuthor = mongoose.Types.ObjectId(req.body.profileId)
-                let liking = !post.likes.some(like => like._id.toString() === likeAuthor.toString())
+                let liking = !post.likes.some ( like => 
+                    like._id.toString() === likeAuthor.toString()
+                )
 
-                likes = post.likes.map(like => like._id)
+                likes = post.likes.map(like => like._id) //...because it's getting autopopulated.
 
                 likes = liking ?
                     [...likes, likeAuthor] :
-                    likes.filter(like => like.toString() !== likeAuthor.toString())                    
+                    likes.filter( like => like.toString() !== likeAuthor.toString() )                    
 
                 let updatedPost = await Post.findByIdAndUpdate(req.params.id, { likes })
 
@@ -130,7 +146,7 @@ router.post(
 )
 
 router.post(
-    "/:id/comment", 
+    "/:id/comments", 
     [body('profileId')
         .custom( async pID => { 
             let profile = 
@@ -199,6 +215,31 @@ router.put("/:id", async(req,res,next) => {
     }
 })
 
+router.put("/:id/comments/:cid", async(req,res,next)=> {
+    try {
+        let post = await Post.findById(req.params.id)
+        let comments = post.comments
+
+        let editIx = 
+            post.comments.findIndex( comment => 
+                comment._id.toString() === req.params.cid 
+            )
+
+        comments[editIx].text = req.body.text
+        
+        let updatedPost = await Post.findByIdAndUpdate(req.params.id, { comments })
+        
+        if (updatedPost) {
+            res.status(201).send("Updated comment.")
+        } else throw new Error("Invalid comment ID or post ID.")
+    } catch (error) {
+        error.httpStatusCode = 400
+        next(error)
+    }
+    
+}) 
+
+
 router.delete("/:id", async(req,res,next) => {
     try {
         let deletedPost = await Post.findByIdAndDelete(req.params.id)
@@ -211,7 +252,7 @@ router.delete("/:id", async(req,res,next) => {
     }
 })
 
-router.delete("/:id/comment/:cid", async(req,res,next)=> {
+router.delete("/:id/comments/:cid", async(req,res,next)=> {
     try {
         let post = await Post.findById(req.params.id)
         post.comments = post.comments.filter( comment => 
