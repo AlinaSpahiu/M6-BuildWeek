@@ -5,21 +5,47 @@ const experiencesRouter = express.Router()
 
 const { experiencesModel } = require("../schemas/experiences")
 
-/////////MULTER //////////////////////// DA VERIFICARE E FINIRE /////////////////////
+
 
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }).single("demo_image");
+const upload = multer({})
+const path = require("path")
+const { writeFile, mkdir } = require("fs-extra")
 
-experiencesRouter.post("/image", (req, res) => {
-    upload(req, res, (err) => {
-        if (err) {
-            res.status(400).send("Image not uploaded");
+
+
+experiencesRouter.post("/:id/upload", upload.single("image"), async (req, res, next) => {
+    try {
+        const publicDir = path.join(__dirname, '..', '..', 'public')
+        let relDirPath = 'experiences'
+        let absDirPath = path.join(publicDir, relDirPath)
+        let ext = req.file.originalname.split('.').pop()
+        let filename = req.params.id + '.' + ext
+        let relFilePath = path.join(relDirPath, filename)
+        let absFilePath = path.join(publicDir, relFilePath)
+
+        mkdir(absDirPath, { recursive: true }, (err) => {
+            if (err) throw err;
+        });
+        await writeFile(
+            absFilePath,
+            req.file.buffer
+        )
+        const updatedExperience = await experiencesModel.findByIdAndUpdate(req.params.id, { image: relFilePath })
+        if (updatedExperience) {
+            res.send("Ok")
+        } else {
+            const error = new Error(`Experience with id ${req.params.id} not found`)
+            error.httpStatusCode = 404
+            next(error)
         }
-        res.send(req.file);
-    });
-});
-//////////////////////MULTER////////////////// DA VERIFICARE E FINIRE//////////////////
+    }
+    catch (error) {
+        error.httpStatusCode = 500
+        next(error)
+    }
 
+})
 experiencesRouter.get("/", async (req, res, next) => {
     try {
         const experiences = await experiencesModel.find(req.query).populate("profile?")/////<--profile o id 

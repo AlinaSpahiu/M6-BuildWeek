@@ -12,9 +12,18 @@ const experiencesService = require("./services/experiences")
 
 const errorsHandler = require("./errorsHandler")
 const server = express()
+const path = require("path")
+
+
 
 server.use(express.json())
 server.use(cors())
+
+server.use(
+  express.static(
+    path.join(__dirname, '../public')
+  )
+)
 
 const listEndpoints = require("express-list-endpoints")
 const mongoose = require("mongoose")
