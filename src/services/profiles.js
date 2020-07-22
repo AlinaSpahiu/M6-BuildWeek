@@ -6,6 +6,11 @@ const q2m = require("query-to-mongo")
 const multer = require("multer")
 const path = require("path")
 const fs = require("fs-extra")
+const pdfDocument = require("pdfkit")
+const pdfPath = path.join(__dirname, "../../public/pdf/profile");
+const doc = new pdfDocument()
+//const Experiences = require("../schemas/experiences")
+
 
 
 const router = express.Router()
@@ -142,5 +147,43 @@ router.post("/:id/upload", upload.single("avatar"), async (req, res, next) => {
   }
 
 })
+
+
+// pdf
+;
+router.get("/:_id/pdf", async (req, res, next) => {
+  try{
+    const profile = await Profile.findOne({
+      _id: req.params._id,
+    })
+
+    
+  console.log(req.params.username)
+    doc.pipe(fs.createWriteStream(`${profile.name}${profile.surname}.pdf`))
+    doc.font("Times-Roman")
+    doc.fontSize(20)
+    doc.text(`${profile.name} ${profile.surname}`, {
+      width: 400,
+      align:"center"
+    })
+    doc.fontSize(15)
+    doc.text(` \n\n\nname: ${profile.name} \nsurname:${profile.surname} \nusername: ${profile.username} \nemail: ${profile.email}\nbio: ${profile.bio}\ntitle: ${profile.title} \narea: ${profile.area}`, {
+      width: 200,
+      align:"left"
+    })
+    
+    
+
+
+    doc.pipe(res)
+    doc.end()
+  }catch(error) {
+    next(error)
+  }
+})
+
+
+
+
 
 module.exports = router
