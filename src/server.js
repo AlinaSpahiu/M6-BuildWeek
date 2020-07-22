@@ -1,5 +1,6 @@
 const express = require("express")
 const cors = require("cors")
+const path = require("path")
 
 const dotenv = require("dotenv")
 dotenv.config()
@@ -21,6 +22,12 @@ const mongoose = require("mongoose")
 
 
 
+//const publicPath = path.join(__dirname, "../public")
+server.use(
+  express.static(
+      path.join(__dirname, '../public')
+  )
+)
 
 server.use("/posts", postsService)
 server.use("/profiles", profilesService)
