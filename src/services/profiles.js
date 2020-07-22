@@ -87,7 +87,57 @@ router.delete("/:id", async (req, res, next) => {
   } catch(error){
     next(error)
   }
+
+})
+
+// 6. UploadImage
+
+const upload = multer({})
+const imagePath = path.join(__dirname, "../../public/profiles");
+
+
+router.post("/:id/upload", upload.single("avatar"), async (req, res, next) => {
+
+  try {
+
+   
+    if (req.file) {
+
+      let absDirPath = path.join(imagePath, req.params.id)
+      let absFilePath = path.join(absDirPath, req.file.originalname)
+
+      let relFilePath = path.join('profiles', req.params.id, req.file.originalname)
+      //linkedin.com/
+      //profiles/aisyfa9sd8fy/filename.jpg //DB
+
+      fs.mkdir(absDirPath, { recursive: true }, (err) => {
+        if (err) throw err;
+      });
   
+      //fs.mkdir
+      console.log(absFilePath)
+      await fs.writeFile(
+        absFilePath, req.file.buffer
+      )
+
+      let updatedProfile = await Profile.findByIdAndUpdate(req.params.id, {image:relFilePath})
+
+      if (updatedProfile) {
+        res.status(200).send("Updated!")
+      } else throw new Error("didn't update!")
+
+      res.send("OK")
+    } else {
+      const err = new Error()
+      err.httpStatusCode = 400
+      err.message = "Image is missing"
+      next(err)
+    }
+  } catch (error) {
+    console.log(error)
+    next(error)
+  }
+
 })
 
 module.exports = router
