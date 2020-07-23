@@ -52,11 +52,22 @@ experiencesRouter.get("/", async (req, res, next) => {
         }).populate("profile?")/////<--profile o id 
         res.send(experiences)
     } catch (error) {
-        next(error)
+        //next(error)
     }
 })
 const userController = require("../controllers/userController")
-experiencesRouter.get('/download', userController.download);
+experiencesRouter.get('/download', async (req, res, next) => {
+    try {
+        const experiences = await experiencesModel.find({
+            profileId: req.profileId
+        })
+        req.experiences = experiences
+        next()
+    }
+    catch (error) {
+        res.status(500).send(error)
+    }
+}, userController.download)
 
 experiencesRouter.get("/:id", async (req, res, next) => {
     try {
