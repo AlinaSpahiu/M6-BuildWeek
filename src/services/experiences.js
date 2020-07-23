@@ -22,7 +22,9 @@ experiencesRouter.post("/image", (req, res) => {
 
 experiencesRouter.get("/", async (req, res, next) => {
     try {
-        const experiences = await experiencesModel.find(req.query).populate("profile?")/////<--profile o id 
+        const experiences = await experiencesModel.find({
+            profileId: req.profileId
+        }).populate("profile?")/////<--profile o id 
         res.send(experiences)
     } catch (error) {
         next(error)
@@ -41,7 +43,12 @@ experiencesRouter.get("/:id", async (req, res, next) => {
 
 experiencesRouter.post("/", async (req, res, next) => {
     try {
-        const newexperience = new experiencesModel(req.body)
+        delete req.body.username
+        const newexperience = new experiencesModel({
+            ...req.body,
+            username: 'admin',
+            profileId: req.profileId
+        })
         const { _id } = await newexperience.save()
 
         res.status(201).send(_id)
@@ -61,6 +68,7 @@ experiencesRouter.put("/:id", async (req, res, next) => {
             next(error)
         }
     } catch (error) {
+        error.httpStatusCode = 400
         next(error)
     }
 })
