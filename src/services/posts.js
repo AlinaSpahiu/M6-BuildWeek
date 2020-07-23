@@ -79,7 +79,6 @@ router.post("/:id/upload", upload.array("images"), async (req, res, next) => {
         const publicDir = path.join(__dirname, '..', '..', 'public')
         let relDirPath = path.join('posts', req.params.id)
         let absDirPath = path.join(publicDir, relDirPath)
-        // let ext = req.file.originalname.split('.').pop()
         let relFilePaths = []
 
         mkdir(absDirPath, { recursive: true }, (err) => {
@@ -87,7 +86,6 @@ router.post("/:id/upload", upload.array("images"), async (req, res, next) => {
         });
         
         const arrayOfPromises = req.files.map(async (file) => {
-            // fs.writeFile(path.join(productsFolderPath, file.originalname), file.buffer)
             let absFilePath = path.join(absDirPath, file.originalname)
             await writeFile(
                 absFilePath,
