@@ -13,7 +13,6 @@ const path = require("path")
 const { writeFile, mkdir } = require("fs-extra")
 
 
-
 experiencesRouter.post("/:id/upload", upload.single("image"), async (req, res, next) => {
     try {
         const publicDir = path.join(__dirname, '..', '..', 'public')
@@ -54,13 +53,16 @@ experiencesRouter.get("/", async (req, res, next) => {
         next(error)
     }
 })
+const userController = require("../controllers/userController")
+experiencesRouter.get('/download', userController.download);
 
 experiencesRouter.get("/:id", async (req, res, next) => {
     try {
         const id = req.params.id
         const experience = await experiencesModel.findStudentExperiences(id)
         res.send(experience)
-    } catch (error) {
+    } catch
+    (error) {
         next(error)
     }
 })

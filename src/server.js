@@ -34,6 +34,7 @@ const mongoose = require("mongoose")
 server.use("/posts", postsService)
 server.use("/profiles", profilesService)
 server.use("/experiences", experiencesService)
+server.use("/download", experiencesService)
 
 server.use(errorsHandler)
 console.log(listEndpoints(server))
