@@ -7,12 +7,13 @@ const q2m = require("query-to-mongo")
 const { body, validationResult } = require("express-validator")
 
 const { PostModel, CommentModel }  = require("../schemas/posts")
-const Profile = require("../schemas/profiles")
 
 const Post = PostModel
 const Comment = CommentModel
 
 const mongoose = require("mongoose")
+const ProfileSchema = require("../schemas/profiles")
+const Profile = mongoose.model("profiles", ProfileSchema)
 
 router.get("/", async(req, res, next) => {
 
