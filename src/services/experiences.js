@@ -5,12 +5,13 @@ const experiencesRouter = express.Router()
 
 const { experiencesModel } = require("../schemas/experiences")
 
-
+const { Parser } = require("json2csv")
 
 const multer = require('multer');
 const upload = multer({})
 const path = require("path")
 const { writeFile, mkdir } = require("fs-extra")
+
 
 
 experiencesRouter.post("/:id/upload", upload.single("image"), async (req, res, next) => {
@@ -55,19 +56,45 @@ experiencesRouter.get("/", async (req, res, next) => {
         //next(error)
     }
 })
-const userController = require("../controllers/userController")
+
 experiencesRouter.get('/download', async (req, res, next) => {
     try {
         const experiences = await experiencesModel.find({
             profileId: req.profileId
         })
-        req.experiences = experiences
-        next()
+
+        const fields = [
+            {
+                label: 'Role',
+                value: 'role'
+            },
+            {
+                label: 'Company',
+                value: 'company'
+            },
+            {
+                label: 'Description',
+                value: 'description'
+            },
+            {
+                label: 'Area',
+                value: 'area'
+            }
+        ];
+
+        const json2csv = new Parser({ fields });
+        const csv = json2csv.parse(experiences);
+
+        res.header('Content-Type', 'text/csv');
+        res.attachment('profiles.csv');
+
+        return res.send(csv);
+        
     }
     catch (error) {
-        res.status(500).send(error)
+        next(error)
     }
-}, userController.download)
+})
 
 experiencesRouter.get("/:id", async (req, res, next) => {
     try {
