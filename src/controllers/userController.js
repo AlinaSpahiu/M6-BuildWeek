@@ -1,5 +1,5 @@
-const profiles = require('../services/profiles')
-const downloadResource = require('./util');
+// const profiles = require('../services/profiles')
+// const downloadResource = require('./util');
 const { Parser } = require("json2csv")
 
 const controller = {};

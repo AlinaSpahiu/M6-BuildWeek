@@ -37,8 +37,8 @@ const Post = new Schema({
         type: String,
         required: [function() { return !this.img }, 'Posts need either a message or an image.']
     },
-    img: {
-        type: String,
+    images: {
+        type: [ String ],
         required: [function() { return !this.text }, 'Posts need either an image or a message.']
     },
     likes: {

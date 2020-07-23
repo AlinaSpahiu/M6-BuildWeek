@@ -68,6 +68,53 @@ router.post("/",
     }
 )
 
+const multer = require('multer');
+const upload = multer({})
+const path = require("path")
+const { writeFile, mkdir } = require("fs-extra")
+
+
+router.post("/:id/upload", upload.array("images"), async (req, res, next) => {
+    try {
+        const publicDir = path.join(__dirname, '..', '..', 'public')
+        let relDirPath = path.join('posts', req.params.id)
+        let absDirPath = path.join(publicDir, relDirPath)
+        // let ext = req.file.originalname.split('.').pop()
+        let relFilePaths = []
+
+        mkdir(absDirPath, { recursive: true }, (err) => {
+            if (err) throw err;
+        });
+        
+        const arrayOfPromises = req.files.map(async (file) => {
+            // fs.writeFile(path.join(productsFolderPath, file.originalname), file.buffer)
+            let absFilePath = path.join(absDirPath, file.originalname)
+            await writeFile(
+                absFilePath,
+                file.buffer
+            )
+            relFilePaths.push(relDirPath + '/' + file.originalname)
+        })
+
+        await Promise.all(arrayOfPromises)
+        
+        console.log(relFilePaths)
+        const updatedPost = await Post.findByIdAndUpdate(req.params.id, { images: relFilePaths })
+        if (updatedPost) {
+            res.send("Ok")
+        } else {
+            const error = new Error(`Experience with id ${req.params.id} not found`)
+            error.httpStatusCode = 404
+            next(error)
+        }
+    }
+    catch (error) {
+        error.httpStatusCode = 500
+        next(error)
+    }
+
+})
+
 router.get("/:id/likes", async(req,res,next) => {
     try {
         let post = await Post.findById(req.params.id)
