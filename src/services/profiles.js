@@ -56,10 +56,13 @@ router.get("/:id", async (req, res, next) => {
 })
 
 // Get experiences
-router.use("/:username/experiences", function(req,res,next) {
-    let profile = Profile.findOne({username: req.params.username})
-    req.profileId = profile._id.toString()
-    next()
+router.use("/:username/experiences", async function(req,res,next) {
+  console.log(req.params.username)
+    let profile = await Profile.findOne({username: req.params.username})
+    if (profile) {
+      req.profileId = profile._id.toString()
+      next()
+    }
 }, experiencesRouter)
  
 // 3. POST:
