@@ -49,7 +49,7 @@ router.get("/:id", async (req, res, next) => {
     }
     console.log(user)
 
-    // if we type an id that doesnt exists we get an error : "Cast to ObjectId failed for value "5f04d25ca5688104a848d0d823" at path "_id" for model "user""
+
   } catch (error) {
     next(error)
   }
@@ -150,14 +150,14 @@ router.post("/:id/upload", upload.single("avatar"), async (req, res, next) => {
 
 
 // pdf
-;
+
 router.get("/:_id/pdf", async (req, res, next) => {
   try{
     const profile = await Profile.findOne({
       _id: req.params._id,
     })
 
-    
+
   console.log(req.params.username)
     doc.pipe(fs.createWriteStream(`${profile.name}${profile.surname}.pdf`))
     doc.font("Times-Roman")
@@ -171,12 +171,10 @@ router.get("/:_id/pdf", async (req, res, next) => {
       width: 200,
       align:"left"
     })
-    
-    
-
-
     doc.pipe(res)
     doc.end()
+    res.send("Done")
+    console.log("done")
   }catch(error) {
     next(error)
   }
