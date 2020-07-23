@@ -14,7 +14,6 @@ const experiencesService = require("./services/experiences")
 const { notFoundHandler,forbiddenHandler, 
   unauthorizedHandler, badRequestHandler, genericErrorHandler} = require("./errorsHandler")
 const server = express()
-const path = require("path")
 
 
 
